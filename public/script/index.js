@@ -5,6 +5,7 @@ const signUp = async (event) => {
   const username = formData.get('username');
   const password = formData.get('pwd');
   const data = { username, password };
+  console.log('inside signup page', username, password);
   const response = await fetch('/signup', {
     method: 'post',
     body: JSON.stringify(data),
@@ -22,4 +23,5 @@ const main = () => {
   console.log('button', button);
   button.addEventListener('click', (event) => signUp(event));
 };
+
 globalThis.onload = main;

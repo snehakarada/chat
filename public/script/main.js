@@ -23,4 +23,15 @@ const renderFriends = async () => {
   });
 };
 
-globalThis.onload = renderFriends;
+const showChat = async () => {
+  alert('hi');
+  const friendName = 'bhagya';
+  const response = await fetch(`/chat/${friendName}`);
+  console.log('The response is', response.text());
+};
+
+const main = async () => {
+  renderFriends();
+};
+
+globalThis.onload = main;

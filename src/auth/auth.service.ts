@@ -5,26 +5,33 @@ import { message, UserInfo } from 'src/types';
 @Injectable()
 export class AuthService {
   constructor(private readonly dbService: DatabaseService) {}
+
   userInfo: UserInfo = {
     username: '',
     password: '',
     frnds: [],
-    chats: [],
+    chats: {},
   };
 
   async signupUser(username: string, password: string) {
+    console.log('inside signup user');
     const db = this.dbService.getDb();
     const usersCollection = db.collection('users');
-    ((this.userInfo = {
+    this.userInfo = {
       username,
       password,
       frnds: ['Bhagya', 'Hima Sai', 'Jayanth', 'Pradeep', 'Malli'],
-      chats: [],
-    }),
-      await usersCollection.insertOne(this.userInfo));
+      chats: {
+        bhagya: [{ from: 'bhagya', to: username, message: 'hello bacche' }],
+      },
+    };
 
+    await usersCollection.insertOne(this.userInfo);
+    console.log('hello');
     const users = usersCollection.find();
-    for await (const user of users) console.log('users are', user);
+    for await (const user of users) {
+      console.log('users are', user);
+    }
 
     return 'successfully stored';
   }
@@ -32,9 +39,9 @@ export class AuthService {
   async signinUser(username: string, password: string, res) {
     const db = this.dbService.getDb();
     const usersCollection = db.collection('users');
-    const users = await usersCollection.find().toArray();
+    const users = usersCollection.find();
 
-    for (const user of users) {
+    for await (const user of users) {
       if (user.username === username && user.password === password) {
         res.cookie('username', username);
         return res.json({ isExist: true });
@@ -62,4 +69,6 @@ export class AuthService {
 
     return ['not found'];
   }
+
+  showChat() {}
 }
