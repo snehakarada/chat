@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Body, Res, Req } from '@nestjs/common';
-import { AuthService, message } from './auth.service';
+import { AuthService } from './auth.service';
+import { Request } from 'express';
 
 @Controller()
 export class AuthController {
@@ -22,5 +23,13 @@ export class AuthController {
   @Get('/getmessage')
   getmessages(@Req() req: any): any {
     return this.authService.getMessage(req.cookies.username);
+  }
+
+  @Get('/getfriends')
+  getFriends(@Req() req: Request) {
+    const username = req.cookies.username;
+    console.log('inside frnds');
+
+    return this.authService.getFriends(username);
   }
 }

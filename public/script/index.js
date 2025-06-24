@@ -13,6 +13,7 @@ const signUp = async (event) => {
     },
   });
   console.log('The response is ', await response.text());
+
   globalThis.location.href = './main.html';
 };
 

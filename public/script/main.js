@@ -22,7 +22,7 @@ const receiveMessage = async () => {
   renderMessages(jsonData);
 };
 
-const main = () => {
+const main = async () => {
   receiveMessage();
   const button = document.getElementById('send');
   button.addEventListener('click', sendMessage);
