@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Res } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 
 export interface message {
@@ -12,7 +12,6 @@ export class AuthService {
   constructor(private readonly dbService: DatabaseService) {}
 
   async signupUser(username: string, password: string) {
-    console.log('hello friends sign up in controller');
     const db = this.dbService.getDb();
     const usersCollection = db.collection('users');
 
@@ -26,18 +25,18 @@ export class AuthService {
     return 'successfully stored';
   }
 
-  async signinUser(username: string, password: string) {
-    console.log('hello friends sigin in controller');
+  async signinUser(username: string, password: string, res) {
     const db = this.dbService.getDb();
     const usersCollection = db.collection('users');
     const users = usersCollection.find();
     for await (const user of users) {
       if (user.name === username && user.password === password) {
-        return { isExist: true };
+        res.cookie('username', username);
+        return res.json({ isExist: true });
       }
     }
 
-    return { isExist: false };
+    return res.json({ isExist: false });
   }
 
   getMessage(username: string): Array<message> {

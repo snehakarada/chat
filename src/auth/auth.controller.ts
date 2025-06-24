@@ -15,20 +15,12 @@ export class AuthController {
   }
 
   @Post('/signin')
-  async signinUser(@Body() body: any) {
-    const value = await this.authService.signinUser(
-      body.username,
-      body.password,
-    );
-
-    return value;
+  signinUser(@Body() body: any, @Res() res: Response) {
+    return this.authService.signinUser(body.username, body.password, res);
   }
 
   @Get('/getmessage')
   getmessages(@Req() req: any): any {
-    console.log('hello');
-    // const username = res.cookies;
-    console.log('The cookies are', req.cookies.username);
     return this.authService.getMessage(req.cookies.username);
   }
 }

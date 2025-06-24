@@ -13,7 +13,6 @@ export class LoggerMiddleware implements NestMiddleware {
 export class CreateSession implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     res.cookie('username', req.body.username);
-    console.log('cookie create bro');
     next();
   }
 }

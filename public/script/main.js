@@ -19,9 +19,6 @@ const receiveMessage = async () => {
   const response = await fetch('/getmessage');
   const jsonData = await response.json();
 
-  // Use this line only if you're not sure about response type
-  // console.log(await response.text());
-
   renderMessages(jsonData);
 };
 
