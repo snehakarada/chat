@@ -14,10 +14,15 @@ export class AuthService {
     chats: {},
   };
 
+  getDb(dbName) {
+    const db = this.dbService.getDb();
+    return db.collection(dbName);
+  }
+
   async signupUser(username: string, password: string) {
     console.log('inside signup user');
     const db = this.dbService.getDb();
-    const usersCollection = db.collection('users');
+    const usersCollection = this.getDb('users');
     const chatCollection = db.collection('conversations');
 
     this.userInfo = {
@@ -47,8 +52,7 @@ export class AuthService {
   }
 
   async signinUser(username: string, password: string, res) {
-    const db = this.dbService.getDb();
-    const usersCollection = db.collection('users');
+    const usersCollection = this.getDb('users');
     const users = usersCollection.find();
 
     for await (const user of users) {
@@ -66,11 +70,10 @@ export class AuthService {
   }
 
   async getFriends(username: string) {
-    const db = this.dbService.getDb();
-    const usersCollection = db.collection('users');
-    const users = await usersCollection.find().toArray();
+    const usersCollection = this.getDb('users');
+    const users = usersCollection.find();
 
-    for (const user of users) {
+    for await (const user of users) {
       if (user.username === username) {
         return user.frnds;
       }
@@ -97,5 +100,41 @@ export class AuthService {
         return chat[conversationId];
       }
     }
+  }
+  async getChatId(from, username) {
+    console.log('inside getChatId');
+    const usersCollection = this.getDb('users');
+    const users = usersCollection.find();
+
+    for await (const user of users) {
+      console.log(
+        'username-cookie :: ',
+        username,
+        'user-username :: ',
+        user.username,
+      );
+
+      if (user.username === username) {
+        return user.chats[from];
+      }
+    }
+  }
+
+  async storeChatInDb(id, chat) {
+    const conversationsCollection = this.getDb('conversations');
+    const conversations = conversationsCollection.find();
+
+    for await (const conversation of conversations) {
+      conversation[id].push(chat);
+    }
+
+    return 'successfully stored!';
+  }
+
+  async storeChat({ from, to, msg }, username) {
+    console.log('inside sercivce--storechart');
+    const id = await this.getChatId(from, username);
+
+    return this.storeChatInDb(id, { from, to, msg });
   }
 }

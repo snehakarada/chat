@@ -38,4 +38,12 @@ export class AuthController {
   showChat(@Param('friendName') name: string, @Req() req: Request) {
     return this.authService.showChat(name, req.cookies.username);
   }
+
+  @Post('/storechat')
+  stroreChat(@Body() data, @Req() req: Request) {
+    console.log('inside store-chat', data);
+    const username = req.cookies.username;
+    console.log('username :: ', username);
+    return this.authService.storeChat(data, username);
+  }
 }
