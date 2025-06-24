@@ -8,7 +8,7 @@ export interface UserInfo {
   username: string;
   password: string;
   frnds: string[];
-  chats: ArrayLike<Chat>;
+  chats: {};
 }
 
 export interface message {

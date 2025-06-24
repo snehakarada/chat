@@ -15,7 +15,7 @@ const signIn = async (event) => {
   const value = await response.json();
 
   if (value.isExist) {
-    globalThis.location.href = './main.html';
+    globalThis.location.href = '../main.html';
   } else {
     alert('not found');
   }

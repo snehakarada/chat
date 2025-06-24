@@ -21,15 +21,15 @@ export class AuthController {
   }
 
   @Get('/getmessage')
-  getmessages(@Req() req: any): any {
-    return this.authService.getMessage(req.cookies.username);
+  async getmessages(@Req() req: any): Promise<any> {
+    return await this.authService.getMessage(req.cookies.username);
   }
 
   @Get('/getfriends')
   getFriends(@Req() req: Request) {
     const username = req.cookies.username;
-    console.log('inside frnds');
+    const frnds = this.authService.getFriends(username);
 
-    return this.authService.getFriends(username);
+    return frnds;
   }
 }

@@ -1,31 +1,26 @@
-const sendMessage = () => {
-  alert('sending');
+const fetchFriends = async () => {
+  const response = await fetch('/getfriends');
+  const friends = await response.json();
+  console.log('friends', friends);
+  return friends;
 };
 
-const renderMessages = (messages) => {
-  const messagesContainer = document.getElementById('messages');
-  messagesContainer.innerHTML = '';
+const renderFriends = async () => {
+  const friends = await fetchFriends();
+  const container = document.getElementById('friends-list');
 
-  messages.forEach((msg) => {
+  friends.forEach((friend) => {
     const div = document.createElement('div');
-    div.classList.add('message');
-    div.classList.add(msg.from === 'me' ? 'from-me' : 'from-other');
-    div.textContent = `${msg.from}: ${msg.message}`;
-    messagesContainer.appendChild(div);
+    div.className = 'friend';
+    div.textContent = friend;
+
+    div.addEventListener('click', () => {
+      alert(`You clicked on ${friend}`);
+      // or handle further logic here
+    });
+
+    container.appendChild(div);
   });
 };
 
-const receiveMessage = async () => {
-  const response = await fetch('/getmessage');
-  const jsonData = await response.json();
-
-  renderMessages(jsonData);
-};
-
-const main = async () => {
-  receiveMessage();
-  const button = document.getElementById('send');
-  button.addEventListener('click', sendMessage);
-};
-
-globalThis.onload = main;
+globalThis.onload = renderFriends;
