@@ -11,6 +11,11 @@ export interface UserInfo {
   chats: {};
 }
 
+export interface Conversations {
+  id: number;
+  conversation: Chat[];
+}
+
 export interface message {
   from: string;
   to: string;
