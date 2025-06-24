@@ -1,6 +1,6 @@
 import { Injectable, Res } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
-import { message, UserInfo } from 'src/types';
+import { Conversations, message, UserInfo } from 'src/types';
 
 @Injectable()
 export class AuthService {
@@ -17,16 +17,22 @@ export class AuthService {
     console.log('inside signup user');
     const db = this.dbService.getDb();
     const usersCollection = db.collection('users');
+    const chatCollection = db.collection('conversations');
+
     this.userInfo = {
       username,
       password,
       frnds: ['Bhagya', 'Hima Sai', 'Jayanth', 'Pradeep', 'Malli'],
       chats: {
-        bhagya: [{ from: 'bhagya', to: username, message: 'hello bacche' }],
+        bhagya: 1,
       },
     };
 
     await usersCollection.insertOne(this.userInfo);
+    await chatCollection.insertOne({
+      1: { from: 'bhagya', to: 'malli', msg: 'hello' },
+    });
+
     console.log('hello');
     const users = usersCollection.find();
     for await (const user of users) {
