@@ -1,6 +1,3 @@
-const { freemem } = require('os');
-const { eventNames } = require('process');
-
 const fetchFriends = async () => {
   const response = await fetch('/getfriends');
   const friends = await response.json();
@@ -9,9 +6,30 @@ const fetchFriends = async () => {
 };
 
 const showChat = async (friendName) => {
-  const friendName = 'bhagya';
   const response = await fetch(`/chat/${friendName}`);
-  console.log('The response is', response.text());
+  const messages = await response.json();
+  console.log('The response is', messages);
+  renderChat(messages, friendName);
+};
+
+const renderChat = (messages, friendName) => {
+  const chatWindow = document.getElementById('chat-window');
+  chatWindow.innerHTML = `<h2>Chat with ${friendName}</h2>`;
+  messages.forEach((msg, index) => {
+    console.log(`Message ${index}:`, msg);
+
+    const div = document.createElement('div');
+    div.classList.add('message');
+    div.classList.add(msg.from === friendName ? 'from-them' : 'from-me');
+
+    div.textContent = msg.msg;
+
+    // TEMP: debugging visuals
+    div.style.border = '1px solid red';
+    div.style.backgroundColor = 'yellow';
+
+    chatWindow.appendChild(div);
+  });
 };
 
 const renderFriends = async () => {
@@ -25,7 +43,6 @@ const renderFriends = async () => {
 
     div.addEventListener('click', () => {
       showChat(friend);
-      // alert(`You clicked on ${friend}`);
     });
 
     container.appendChild(div);

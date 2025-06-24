@@ -1,4 +1,5 @@
 import { Injectable, Res } from '@nestjs/common';
+import { ConnectionCheckOutStartedEvent } from 'mongodb';
 import { DatabaseService } from 'src/database/database.service';
 import { Conversations, message, UserInfo } from 'src/types';
 
@@ -22,7 +23,7 @@ export class AuthService {
     this.userInfo = {
       username,
       password,
-      frnds: ['Bhagya', 'Hima Sai', 'Jayanth', 'Pradeep', 'Malli'],
+      frnds: ['bhagya', 'Hima Sai', 'Jayanth', 'Pradeep', 'Malli'],
       chats: {
         bhagya: 1,
       },
@@ -30,7 +31,10 @@ export class AuthService {
 
     await usersCollection.insertOne(this.userInfo);
     await chatCollection.insertOne({
-      1: { from: 'bhagya', to: 'malli', msg: 'hello' },
+      1: [
+        { from: 'bhagya', to: 'malli', msg: 'hello' },
+        { from: 'malli', to: 'bhagya', msg: 'Hey Hi' },
+      ],
     });
 
     console.log('hello');
@@ -68,7 +72,6 @@ export class AuthService {
 
     for (const user of users) {
       if (user.username === username) {
-        console.log('match found');
         return user.frnds;
       }
     }
@@ -76,5 +79,23 @@ export class AuthService {
     return ['not found'];
   }
 
-  showChat() {}
+  async showChat(friendName: string, userName: string) {
+    const db = this.dbService.getDb();
+    const usersCollection = db.collection('users');
+    const users = usersCollection.find();
+    let conversationId: number = 0;
+    for await (const user of users) {
+      if (user.username === userName) {
+        conversationId = user.chats[friendName];
+        break;
+      }
+    }
+    const chatCollection = db.collection('conversations');
+    const chats = await chatCollection.find().toArray();
+    for (const chat of chats) {
+      if (Number(Object.keys(chat)[0]) === conversationId) {
+        return chat[conversationId];
+      }
+    }
+  }
 }

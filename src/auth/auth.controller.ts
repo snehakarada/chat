@@ -13,13 +13,11 @@ export class AuthController {
 
   @Post('/signup')
   signupUser(@Body() body: any) {
-    console.log('inside signup user controller');
     return this.authService.signupUser(body.username, body.password);
   }
 
   @Post('/signin')
   signinUser(@Body() body: any, @Res() res: Response) {
-    console.log('inside signin', body.username, body.password);
     return this.authService.signinUser(body.username, body.password, res);
   }
 
@@ -37,8 +35,7 @@ export class AuthController {
   }
 
   @Get('/chat/:friendName')
-  showChat(@Param('friendName') name: string) {
-    console.log('The friend name is', name);
-    return 'done';
+  showChat(@Param('friendName') name: string, @Req() req: Request) {
+    return this.authService.showChat(name, req.cookies.username);
   }
 }
