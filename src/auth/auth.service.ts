@@ -22,7 +22,7 @@ export class AuthService {
   async signupUser(username: string, password: string) {
     const db = this.dbService.getDb();
     const usersCollection = this.getDb('users');
-    const chatCollection = db.collection('conversations');
+    const chatCollection = this.getDb('conversations');
 
     this.userInfo = {
       username,
@@ -55,10 +55,8 @@ export class AuthService {
     });
 
     const users = usersCollection.find();
-    for await (const user of users) {
-    }
 
-    return 'successfully stored';
+    return { isAccountCreated: true, message: 'Account created successfully' };
   }
 
   async signinUser(username: string, password: string, res) {
@@ -111,6 +109,7 @@ export class AuthService {
       }
     }
   }
+
   async getChatId(from, username) {
     const usersCollection = this.getDb('users');
     const users = usersCollection.find();

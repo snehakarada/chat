@@ -12,8 +12,12 @@ const signUp = async (event) => {
       'Content-Type': 'application/json',
     },
   });
+  const { isAccountCreated, messgae } = await response.json();
+  if (isAccountCreated) {
+    globalThis.location.href = '../main.html';
+  }
 
-  globalThis.location.href = '../main.html';
+  alert(error);
 };
 
 const main = () => {

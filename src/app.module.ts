@@ -3,7 +3,11 @@ import { AppController } from './app.controller';
 import { DatabaseService } from './database/database.service';
 import { AuthService } from './auth/auth.service';
 import { AuthController } from './auth/auth.controller';
-import { CreateSession, LoggerMiddleware } from './auth/auth.middleware';
+import {
+  CreateSession,
+  LoggerMiddleware,
+  ValidateUserName,
+} from './auth/auth.middleware';
 
 @Module({
   imports: [],
@@ -14,6 +18,7 @@ import { CreateSession, LoggerMiddleware } from './auth/auth.middleware';
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes('*');
+    consumer.apply(ValidateUserName).forRoutes('/signup');
     consumer.apply(CreateSession).forRoutes('/signup');
   }
 }
