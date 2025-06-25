@@ -4,11 +4,16 @@ export interface Chat {
   msg: string;
 }
 
+export interface ChatMeta {
+  name: string;
+  last_message: string;
+  chat_id: string;
+}
+
 export interface UserInfo {
   username: string;
   password: string;
-  frnds: string[];
-  chats: {};
+  chats: ChatMeta[];
 }
 
 export interface Conversations {

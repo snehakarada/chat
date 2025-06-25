@@ -11,8 +11,7 @@ export class AuthService {
   userInfo: UserInfo = {
     username: '',
     password: '',
-    frnds: [],
-    chats: {},
+    chats: [],
   };
 
   getDb(dbName) {
@@ -28,11 +27,23 @@ export class AuthService {
     this.userInfo = {
       username,
       password,
-      frnds: ['bhagya', 'Hima_Sai', 'Jayanth', 'Pradeep', 'Malli'],
-      chats: {
-        bhagya: 1,
-        Hima_Sai: 2,
-      },
+      chats: [
+        {
+          name: 'bhagya',
+          last_message: "Hey what's up ?",
+          chat_id: '1',
+        },
+        {
+          name: 'abc',
+          last_message: 'Hey there !',
+          chat_id: '2',
+        },
+        {
+          name: 'Guy 1',
+          last_message: 'Hi',
+          chat_id: '3',
+        },
+      ],
     };
 
     await usersCollection.insertOne(this.userInfo);
