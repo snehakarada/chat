@@ -3,7 +3,6 @@ import { MongoClient, Db } from 'mongodb';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-
 @Injectable()
 export class DatabaseService implements OnModuleInit {
   private client: MongoClient;

@@ -1,7 +1,6 @@
 const fetchFriends = async () => {
   const response = await fetch('/getfriends');
   const friends = await response.json();
-  console.log('friends', friends);
   return friends;
 };
 

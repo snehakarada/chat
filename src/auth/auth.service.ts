@@ -1,5 +1,6 @@
 import { Injectable, Res } from '@nestjs/common';
 import { ConnectionCheckOutStartedEvent } from 'mongodb';
+import { userInfo } from 'os';
 import { DatabaseService } from 'src/database/database.service';
 import { Conversations, message, UserInfo } from 'src/types';
 
@@ -20,7 +21,6 @@ export class AuthService {
   }
 
   async signupUser(username: string, password: string) {
-    console.log('inside signup user');
     const db = this.dbService.getDb();
     const usersCollection = this.getDb('users');
     const chatCollection = db.collection('conversations');
@@ -28,24 +28,23 @@ export class AuthService {
     this.userInfo = {
       username,
       password,
-      frnds: ['bhagya', 'Hima Sai', 'Jayanth', 'Pradeep', 'Malli'],
+      frnds: ['bhagya', 'Hima_Sai', 'Jayanth', 'Pradeep', 'Malli'],
       chats: {
         bhagya: 1,
+        Hima_Sai: 2,
       },
     };
 
     await usersCollection.insertOne(this.userInfo);
     await chatCollection.insertOne({
-      1: [
-        { from: 'bhagya', to: 'malli', msg: 'hello' },
-        { from: 'malli', to: 'bhagya', msg: 'Hey Hi' },
-      ],
+      from: 'bhagya',
+      to: 'malli',
+      msg: 'hello',
+      chat_id: 1,
     });
 
-    console.log('hello');
     const users = usersCollection.find();
     for await (const user of users) {
-      console.log('users are', user);
     }
 
     return 'successfully stored';
@@ -102,39 +101,24 @@ export class AuthService {
     }
   }
   async getChatId(from, username) {
-    console.log('inside getChatId');
     const usersCollection = this.getDb('users');
     const users = usersCollection.find();
 
     for await (const user of users) {
-      console.log(
-        'username-cookie :: ',
-        username,
-        'user-username :: ',
-        user.username,
-      );
-
       if (user.username === username) {
         return user.chats[from];
       }
     }
   }
 
-  async storeChatInDb(id, chat) {
-    const conversationsCollection = this.getDb('conversations');
-    const conversations = conversationsCollection.find();
-
-    for await (const conversation of conversations) {
-      conversation[id].push(chat);
-    }
-
+  async storeChatInDb(chat) {
+    const conversations = this.getDb('conversations');
+    conversations.insertOne(chat);
     return 'successfully stored!';
   }
 
   async storeChat({ from, to, msg }, username) {
-    console.log('inside sercivce--storechart');
     const id = await this.getChatId(from, username);
-
-    return this.storeChatInDb(id, { from, to, msg });
+    return this.storeChatInDb({ from, to, msg, chat_id: id });
   }
 }

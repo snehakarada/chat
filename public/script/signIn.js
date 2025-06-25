@@ -23,7 +23,6 @@ const signIn = async (event) => {
 
 const main = () => {
   const button = document.querySelector('.submit');
-  console.log('button', button);
   button.addEventListener('click', (event) => signIn(event));
 };
 globalThis.onload = main;
