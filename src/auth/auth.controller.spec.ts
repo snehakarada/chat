@@ -15,7 +15,7 @@ describe('AuthSerice', () => {
 
   describe('root', () => {
     it('should return "Hello World!"', () => {
-      expect(authService).toBe('Hello World!');
+      expect(authService.isNameValid).toBe('Hello World!');
     });
   });
 });

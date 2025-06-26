@@ -1,7 +1,4 @@
 import { Injectable, Res } from '@nestjs/common';
-import { captureRejectionSymbol } from 'events';
-import { urlencoded } from 'express';
-import { ConnectionCheckOutStartedEvent } from 'mongodb';
 import { DatabaseService } from 'src/database/database.service';
 import { Chat, ChatMeta, Conversations, message, UserInfo } from 'src/types';
 
@@ -135,7 +132,7 @@ export class AuthService {
 
   async getFriendName(chatId: string, sessionId: string) {
     const usersCollection = this.getDb('users');
-    const username = this.sessions[sessionId];
+    const username = this.getUsername(sessionId);
     const chats = await usersCollection
       .find({ username: username }, { projection: { chats: 1 } })
       .toArray();
