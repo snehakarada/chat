@@ -25,10 +25,10 @@ export class AuthController {
   @Get('/chat-list')
   async getFriends(@Req() req: Request) {
     const username = req.cookies.username;
-    const frnds = await (await this.authService.getFriends(username)).toArray();
-    console.log('frnds :: ', frnds[0]);
+    const frnds = await this.authService.chatList(username);
+    console.log('frnds :: ', frnds);
 
-    return frnds[0];
+    return frnds;
   }
 
   @Get('/chat/:chatId')

@@ -100,15 +100,16 @@ export class AuthService {
     return res.json({ isExist: false });
   }
 
-  async getFriends(username: string) {
+  async chatList(username: string) {
     const usersCollection = this.getDb('users');
     const user = usersCollection.find(
       { username },
       { projection: { username: 1, chats: 1 } },
     );
 
-    console.log('user-info :: ', user);
-    return user;
+    const chatList = (await user.toArray())[0];
+    console.log('chatList :: ', chatList);
+    return chatList;
   }
 
   async getFriendName(chatId: string, sessionId: string) {
