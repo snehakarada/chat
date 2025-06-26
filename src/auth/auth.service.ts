@@ -33,7 +33,6 @@ export class AuthService {
     const cookie = Math.random().toString(36).substring(2);
     res.cookie('sessionId', cookie);
     this.sessions[cookie] = username;
-    console.log(this.sessions);
   };
 
   async signupUser(username: string, password: string, res) {
@@ -112,24 +111,11 @@ export class AuthService {
     return user;
   }
 
-  async showChat(friendName: string, userName: string) {
-    const db = this.dbService.getDb();
-    const usersCollection = db.collection('users');
-    const users = usersCollection.find();
-    let conversationId: number = 0;
-    for await (const user of users) {
-      if (user.username === userName) {
-        conversationId = user.chats[friendName];
-        break;
-      }
-    }
-    const chatCollection = db.collection('conversations');
-    const chats = await chatCollection.find().toArray();
-    for (const chat of chats) {
-      if (Number(Object.keys(chat)[0]) === conversationId) {
-        return chat[conversationId];
-      }
-    }
+  async showChat(chatId: string, sessionId: string) {
+    const usersCollection = this.getDb('users');
+    const username = this.sessions[sessionId];
+    const user = await usersCollection.find({ usrename: username }).toArray();
+    const index = user;
   }
 
   async getChatId(from, username) {

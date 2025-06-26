@@ -31,9 +31,9 @@ export class AuthController {
     return frnds[0];
   }
 
-  @Get('/chat/:friendName')
-  showChat(@Param('friendName') name: string, @Req() req: Request) {
-    return this.authService.showChat(name, req.cookies.username);
+  @Get('/chat/:chatId')
+  showChat(@Param('chatId') chatId: string, @Req() req: Request) {
+    return this.authService.showChat(chatId, req.cookies.sessionId);
   }
 
   @Post('/storechat')
