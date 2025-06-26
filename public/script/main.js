@@ -6,14 +6,23 @@ const fetchFriends = async () => {
 
 const showChat = async (friendName) => {
   const response = await fetch(`/chat/${friendName}`);
-  const messages = await response.json();
-  console.log('The response is', messages);
-  renderChat(messages, friendName);
+  const chatData = await response.json();
+
+  const chatName = chatData.chatName;
+  const messages = chatData.chats;
+
+  console.log('The response is', chatName, messages);
+  renderChat(messages, chatName);
 };
 
-const renderChat = (messages, friendName) => {
+const renderChat = (messages, chatName) => {
   const chatWindow = document.getElementById('chat-window');
-  chatWindow.innerHTML = `<h2>Chat with ${friendName}</h2>`;
+  chatWindow.innerHTML = ''; // Clear previous content
+
+  // Display chat name at the top
+  const header = document.createElement('h2');
+  header.textContent = `Chat with ${chatName}`;
+  chatWindow.appendChild(header);
 
   const messagesContainer = document.createElement('div');
   messagesContainer.style.flex = '1';
@@ -24,7 +33,7 @@ const renderChat = (messages, friendName) => {
 
     const div = document.createElement('div');
     div.classList.add('message');
-    div.classList.add(msg.from === friendName ? 'from-them' : 'from-me');
+    div.classList.add(msg.from === chatName ? 'from-them' : 'from-me');
     div.textContent = msg.msg;
 
     // TEMP: debugging visuals
@@ -69,14 +78,13 @@ const renderChat = (messages, friendName) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          to: friendName,
+          to: chatName,
           msg: msg,
         }),
       });
 
       inputBox.value = '';
-      // Optionally: refresh the chat window after sending
-      // await showChat(friendName);
+      await showChat(chatName); // Refresh chat after sending
     } catch (err) {
       console.error('Error sending message:', err);
     }

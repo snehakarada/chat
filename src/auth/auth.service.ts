@@ -1,4 +1,5 @@
 import { Injectable, Res } from '@nestjs/common';
+import { captureRejectionSymbol } from 'events';
 import { urlencoded } from 'express';
 import { ConnectionCheckOutStartedEvent } from 'mongodb';
 import { DatabaseService } from 'src/database/database.service';
@@ -90,14 +91,13 @@ export class AuthService {
     const users = usersCollection.find();
 
     for await (const user of users) {
-      if (!(user.username === username && user.password === password)) {
-        return res.json({ isExist: false });
+      if (user.username === username || user.password === password) {
+        this.createSession(username, res);
+        return res.json({ isExist: true, url: '../main.html' });
       }
     }
 
-    this.createSession(username, res);
-
-    return res.json({ isExist: true, url: '../main.html' });
+    return res.json({ isExist: false });
   }
 
   async getFriends(username: string) {
@@ -111,11 +111,22 @@ export class AuthService {
     return user;
   }
 
-  async showChat(chatId: string, sessionId: string) {
+  async getFriendName(chatId: string, sessionId: string) {
     const usersCollection = this.getDb('users');
     const username = this.sessions[sessionId];
-    const user = await usersCollection.find({ usrename: username }).toArray();
-    const index = user;
+    const chats = await usersCollection
+      .find({ username: username }, { projection: { chats: 1 } })
+      .toArray();
+    const index = chats[0].chats.findIndex((chat) => chat.chat_id === chatId);
+    return chats[0].chats[index].name;
+  }
+
+  async showChat(chatId: string, sessionId: string) {
+    const friendName = this.getFriendName(chatId, sessionId);
+    const chatCollection = this.getDb('conversations');
+    const chats = await chatCollection.find({ chat_id: chatId }).toArray();
+
+    return { chatName: friendName, chats: chats };
   }
 
   async getChatId(from, username) {
@@ -139,7 +150,7 @@ export class AuthService {
   }
 
   async storeChat({ from, to, msg }, username) {
-    const id = await this.getChatId(from, username); //u can validate is from(frnd) is present or not by checking Id
+    const id = await this.getChatId(from, username);
 
     return this.storeChatInDb({ from, to, msg, chat_id: id });
   }

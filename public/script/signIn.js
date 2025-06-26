@@ -13,6 +13,7 @@ const signIn = async (event) => {
     },
   });
   const value = await response.json();
+  console.log('response', value.isExist);
 
   if (value.isExist) {
     globalThis.location.href = value.url;
