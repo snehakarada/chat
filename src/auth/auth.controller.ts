@@ -13,7 +13,6 @@ export class AuthController {
 
   @Post('/signup')
   signupUser(@Body() body: any, @Res() res: Response) {
-    console.log('inside signup');
     return this.authService.signupUser(body.username, body.password, res);
   }
 
@@ -24,9 +23,9 @@ export class AuthController {
 
   @Get('/chat-list')
   async getFriends(@Req() req: Request) {
-    const username = req.cookies.username;
+    const sessionId = req.cookies.sessionId;
+    const username = this.authService.getUsername(sessionId);
     const frnds = await this.authService.chatList(username);
-    console.log('frnds :: ', frnds);
 
     return frnds;
   }
@@ -38,7 +37,8 @@ export class AuthController {
 
   @Post('/storechat')
   stroreChat(@Body() data, @Req() req: Request) {
-    const username = req.cookies.username;
+    const sessionId = req.cookies.sessionId;
+    const username = this.authService.getUsername(sessionId);
     return this.authService.storeChat(data, username);
   }
 }

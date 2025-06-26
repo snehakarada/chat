@@ -17,6 +17,10 @@ export class AuthService {
 
   sessions: object = {};
 
+  getUsername(sessionId: string) {
+    return this.sessions[sessionId];
+  }
+
   getDb(dbName) {
     const db = this.dbService.getDb();
     return db.collection(dbName);
@@ -108,7 +112,6 @@ export class AuthService {
     );
 
     const chatList = (await user.toArray())[0];
-    console.log('chatList :: ', chatList);
     return chatList;
   }
 

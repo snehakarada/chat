@@ -11,7 +11,6 @@ const showChat = async (friendName) => {
   const chatName = chatData.chatName;
   const messages = chatData.chats;
 
-  console.log('The response is', chatName, messages);
   renderChat(messages, chatName);
 };
 
@@ -29,8 +28,6 @@ const renderChat = (messages, chatName) => {
   messagesContainer.style.overflowY = 'auto';
 
   messages.forEach((msg, index) => {
-    console.log(`Message ${index}:`, msg);
-
     const div = document.createElement('div');
     div.classList.add('message');
     div.classList.add(msg.from === chatName ? 'from-them' : 'from-me');
