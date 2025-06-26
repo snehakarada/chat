@@ -1,5 +1,5 @@
 const fetchFriends = async () => {
-  const response = await fetch('/getfriends');
+  const response = await fetch('/chat-list');
   const friends = await response.json();
   return friends;
 };

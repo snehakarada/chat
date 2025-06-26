@@ -2,6 +2,7 @@ export interface Chat {
   from: string;
   to: string;
   msg: string;
+  chat_id: string;
 }
 
 export interface ChatMeta {

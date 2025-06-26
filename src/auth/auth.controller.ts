@@ -22,12 +22,13 @@ export class AuthController {
     return this.authService.signinUser(body.username, body.password, res);
   }
 
-  @Get('/getfriends')
-  getFriends(@Req() req: Request) {
+  @Get('/chat-list')
+  async getFriends(@Req() req: Request) {
     const username = req.cookies.username;
-    const frnds = this.authService.getFriends(username);
+    const frnds = await (await this.authService.getFriends(username)).toArray();
+    console.log('frnds :: ', frnds[0]);
 
-    return frnds;
+    return frnds[0];
   }
 
   @Get('/chat/:friendName')
