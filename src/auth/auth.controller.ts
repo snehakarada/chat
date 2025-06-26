@@ -12,18 +12,14 @@ export class AuthController {
   }
 
   @Post('/signup')
-  signupUser(@Body() body: any) {
-    return this.authService.signupUser(body.username, body.password);
+  signupUser(@Body() body: any, @Res() res: Response) {
+    console.log('inside signup');
+    return this.authService.signupUser(body.username, body.password, res);
   }
 
   @Post('/signin')
   signinUser(@Body() body: any, @Res() res: Response) {
     return this.authService.signinUser(body.username, body.password, res);
-  }
-
-  @Get('/getmessage')
-  async getmessages(@Req() req: any): Promise<any> {
-    return await this.authService.getMessage(req.cookies.username);
   }
 
   @Get('/getfriends')

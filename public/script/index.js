@@ -12,12 +12,13 @@ const signUp = async (event) => {
       'Content-Type': 'application/json',
     },
   });
-  const { isAccountCreated, messgae } = await response.json();
+  const { isAccountCreated, message, url } = await response.json();
+  console.log('The response is', isAccountCreated, message);
   if (isAccountCreated) {
-    globalThis.location.href = '../main.html';
+    globalThis.location.href = url;
   }
 
-  alert(error);
+  alert(message);
 };
 
 const main = () => {

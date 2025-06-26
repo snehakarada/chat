@@ -1,6 +1,6 @@
 import { Injectable, Res } from '@nestjs/common';
+import { urlencoded } from 'express';
 import { ConnectionCheckOutStartedEvent } from 'mongodb';
-import { userInfo } from 'os';
 import { DatabaseService } from 'src/database/database.service';
 import { Conversations, message, UserInfo } from 'src/types';
 
@@ -14,15 +14,41 @@ export class AuthService {
     chats: [],
   };
 
+  sessions: object = {};
+
   getDb(dbName) {
     const db = this.dbService.getDb();
     return db.collection(dbName);
   }
 
-  async signupUser(username: string, password: string) {
+  async isNameValid(username: string, usersCollection) {
+    const values = await usersCollection.find({ username: username }).toArray();
+    if (values.length > 0) {
+      return false;
+    }
+    return true;
+  }
+
+  createSession = (username: string, res) => {
+    const cookie = Math.random().toString(36).substring(2);
+    res.cookie('sessionId', cookie);
+    this.sessions[cookie] = username;
+    console.log(this.sessions);
+  };
+
+  async signupUser(username: string, password: string, res) {
     const db = this.dbService.getDb();
     const usersCollection = this.getDb('users');
     const chatCollection = this.getDb('conversations');
+    const value = await this.isNameValid(username, usersCollection);
+
+    if (!value) {
+      return res.json({
+        isAccountCreated: false,
+        message: `${username} is already used`,
+        url: null,
+      });
+    }
 
     this.userInfo = {
       username,
@@ -54,9 +80,11 @@ export class AuthService {
       chat_id: 1,
     });
 
-    const users = usersCollection.find();
-
-    return { isAccountCreated: true, message: 'Account created successfully' };
+    return res.json({
+      isAccountCreated: true,
+      message: 'Account created successfully',
+      url: '../signin.html',
+    });
   }
 
   async signinUser(username: string, password: string, res) {
@@ -64,17 +92,14 @@ export class AuthService {
     const users = usersCollection.find();
 
     for await (const user of users) {
-      if (user.username === username && user.password === password) {
-        res.cookie('username', username);
-        return res.json({ isExist: true });
+      if (!(user.username === username && user.password === password)) {
+        return res.json({ isExist: false });
       }
     }
 
-    return res.json({ isExist: false });
-  }
+    this.createSession(username, res);
 
-  getMessage(username: string): Array<message> {
-    return [{ from: 'sneha', to: username, message: 'hello' }];
+    return res.json({ isExist: true, url: '../main.html' });
   }
 
   async getFriends(username: string) {

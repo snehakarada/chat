@@ -18,11 +18,3 @@ export class ValidateUserName implements NestMiddleware {
     next();
   }
 }
-
-@Injectable()
-export class CreateSession implements NestMiddleware {
-  use(req: Request, res: Response, next: NextFunction) {
-    res.cookie('username', req.body.username);
-    next();
-  }
-}
