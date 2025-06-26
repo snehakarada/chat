@@ -15,7 +15,7 @@ export class AuthService {
     chats: [],
   };
 
-  sessions: object = {};
+  sessions: object = { '123': 'Malli' };
 
   getUsername(sessionId: string) {
     return this.sessions[sessionId];
@@ -111,7 +111,25 @@ export class AuthService {
       { projection: { username: 1, chats: 1 } },
     );
 
+    // user.chats = [
+    //   {
+    //     name: 'bhagya',
+    //     last_message: "Hey what's up ?",
+    //     chat_id: '1',
+    //   },
+    //   {
+    //     name: 'abc',
+    //     last_message: 'Hey there !',
+    //     chat_id: '2',
+    //   },
+    //   {
+    //     name: 'Guy 1',
+    //     last_message: 'Hi',
+    //     chat_id: '3',
+    //   },
+    // ];
     const chatList = (await user.toArray())[0];
+
     return chatList;
   }
 

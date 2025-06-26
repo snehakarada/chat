@@ -38,6 +38,7 @@ export class AuthController {
   @Post('/storechat')
   stroreChat(@Body() data, @Req() req: Request) {
     const sessionId = req.cookies.sessionId;
+
     const username = this.authService.getUsername(sessionId);
     return this.authService.storeChat(data, username);
   }
