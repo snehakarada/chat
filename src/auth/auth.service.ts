@@ -13,7 +13,7 @@ export class AuthService {
     chats: [],
   };
 
-  sessions: object = { '123': 'Malli' };
+  sessions: object = {};
 
   counter: number = 0;
 
@@ -174,7 +174,7 @@ export class AuthService {
     await users.updateOne(
       { username: name },
       {
-        $push: { chats: chat },
+        $push: { chats: userChat },
       },
     );
 
