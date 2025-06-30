@@ -1,6 +1,7 @@
 import { Injectable, Res } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { Chat, ChatMeta, Conversations, message, UserInfo } from 'src/types';
+import { Collection } from 'mongodb';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +14,8 @@ export class AuthService {
   };
 
   sessions: object = { '123': 'Malli' };
+
+  counter: number = 0;
 
   getUsername(sessionId: string) {
     return this.sessions[sessionId];
@@ -35,6 +38,7 @@ export class AuthService {
     const cookie = Math.random().toString(36).substring(2);
     res.cookie('sessionId', cookie);
     this.sessions[cookie] = username;
+    return 'done';
   };
 
   async signupUser(username: string, password: string, res) {
@@ -56,30 +60,13 @@ export class AuthService {
       password,
       chats: [
         {
-          name: 'bhagya',
+          name: 'defalut',
           last_message: "Hey what's up ?",
-          chat_id: '1',
-        },
-        {
-          name: 'abc',
-          last_message: 'Hey there !',
-          chat_id: '2',
-        },
-        {
-          name: 'Guy 1',
-          last_message: 'Hi',
-          chat_id: '3',
+          chat_id: '0',
         },
       ],
     };
     await usersCollection.insertOne(this.userInfo);
-    await chatCollection.insertOne({
-      from: 'bhagya',
-      to: 'malli',
-      msg: 'hello',
-      chat_id: 1,
-    });
-
     return res.json({
       isAccountCreated: true,
       message: 'Account created successfully',
@@ -103,31 +90,10 @@ export class AuthService {
 
   async chatList(username: string) {
     const usersCollection = this.getDb('users');
-    const user = usersCollection.find(
-      { username },
-      { projection: { username: 1, chats: 1 } },
-    );
-
-    // user.chats = [
-    //   {
-    //     name: 'bhagya',
-    //     last_message: "Hey what's up ?",
-    //     chat_id: '1',
-    //   },
-    //   {
-    //     name: 'abc',
-    //     last_message: 'Hey there !',
-    //     chat_id: '2',
-    //   },
-    //   {
-    //     name: 'Guy 1',
-    //     last_message: 'Hi',
-    //     chat_id: '3',
-    //   },
-    // ];
-    const chatList = (await user.toArray())[0];
-
-    return chatList;
+    const user = await usersCollection
+      .find({ username }, { projection: { username: 1, chats: 1 } })
+      .toArray();
+    return user[0];
   }
 
   async getFriendName(chatId: string, sessionId: string) {
@@ -141,19 +107,19 @@ export class AuthService {
   }
 
   async showChat(chatId: string, sessionId: string) {
-    const friendName = this.getFriendName(chatId, sessionId);
+    const friendName = await this.getFriendName(chatId, sessionId);
     const chatCollection = this.getDb('conversations');
     const chats = await chatCollection.find({ chat_id: chatId }).toArray();
-
+    console.log('The friend name is', friendName, chats);
     return { chatName: friendName, chats: chats };
   }
 
-  async getChatId(from, username) {
+  async getChatId(to: string, username: string) {
     const usersCollection = this.getDb('users');
     const user = await usersCollection.findOne({ username });
 
     if (user) {
-      const chat = user.chats.find((c: ChatMeta) => c.name === from);
+      const chat = user.chats.find((c: ChatMeta) => c.name === to);
 
       return chat?.chat_id ?? null;
     }
@@ -164,13 +130,54 @@ export class AuthService {
   async storeChatInDb(chat: Chat) {
     const conversations = this.getDb('conversations');
     conversations.insertOne(chat);
-
     return 'successfully stored!';
   }
 
-  async storeChat({ from, to, msg }, username) {
-    const id = await this.getChatId(from, username);
+  async storeChat({ to, msg }, username) {
+    console.log('The values are', to, msg, username);
+    const id = await this.getChatId(to, username);
 
-    return this.storeChatInDb({ from, to, msg, chat_id: id });
+    return this.storeChatInDb({ from: username, to, msg, chat_id: id });
+  }
+
+  searchFriends(username: string, name: string): object {
+    const users = this.getDb('users');
+    const value = users.find({ username: name });
+    if (value) return { isExist: true };
+    return { isExist: false };
+  }
+
+  async sentFollowRequest(username: string, name: string): Promise<string> {
+    const db = this.dbService.getDb();
+    const users: Collection<UserInfo> = db.collection('users');
+    this.counter += 1;
+
+    const chat: ChatMeta = {
+      name,
+      last_message: '',
+      chat_id: this.counter.toString(),
+    };
+
+    const userChat: ChatMeta = {
+      name: username,
+      last_message: '',
+      chat_id: this.counter.toString(),
+    };
+
+    await users.updateOne(
+      { username },
+      {
+        $push: { chats: chat },
+      },
+    );
+
+    await users.updateOne(
+      { username: name },
+      {
+        $push: { chats: chat },
+      },
+    );
+
+    return 'request sent';
   }
 }

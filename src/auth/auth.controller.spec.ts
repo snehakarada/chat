@@ -13,9 +13,27 @@ describe('AuthSerice', () => {
     authService = app.get<AuthService>(AuthService);
   });
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(authService.isNameValid).toBe('Hello World!');
+  // describe('root', () => {
+  //   it('should give false', () => {
+  //     const res = {
+  //       cookie: jest.fn(),
+  //     };
+  //     authService.expect(createSession('superman', res)).toB;
+  //   });
+  // });
+
+  describe('authService.createSession', () => {
+    it('should create a session, set a cookie, and return "done"', () => {
+      // Arrange: mock the response object
+      const res = {
+        cookie: jest.fn(),
+      };
+
+      // Act: call the function
+      const result = authService.createSession('superman', res);
+
+      // Assert: returned value
+      expect(result).toBe('done');
     });
   });
 });
